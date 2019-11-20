@@ -1,0 +1,16 @@
+action a,b,c;
+const int Bound=20;
+int(0..Bound) count=0;
+bool did_c=false;
+property DidWeCoC=E<>did_c;
+
+do{
+::a;
+b{=count=count+1=}
+::when(count>-2)b;
+a;
+break
+};
+do{
+::c{=did_c=true=}
+}
