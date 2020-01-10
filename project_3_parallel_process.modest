@@ -1,0 +1,57 @@
+action start_p,available_p,idle_p,preheat;
+action start_a,idle_a,align,is_slew_needed,slewed,correct_attitude,available_a,start,end,check_attitude,is_slew_back_needed,slew_back,correct_slew_back;
+action start_b,update_b,depletion,not_depleted;
+
+
+bool isaligned = false;
+bool reached = true; 
+
+process JobProvider()
+{
+start_p;
+do {
+available_p;
+idle_p;
+preheat
+}
+}
+
+process battery()
+{
+start_b;
+
+do {
+update_b;
+alt {
+::depletion
+::not_depleted
+}
+}}
+
+process JobAutomaton()
+{
+start_a;
+
+do {
+idle_a;
+align;
+alt {
+::when (isaligned == false) is_slew_needed; 
+when(reached == true)slewed 
+:: when (isaligned == true) correct_attitude
+};
+available_a;
+start;
+end;
+check_attitude;
+alt {
+::is_slew_back_needed; slew_back
+::correct_slew_back
+}}}
+
+
+par{
+::JobProvider()
+::JobAutomaton()
+::battery()
+}
