@@ -1,0 +1,14 @@
+const int c = 4;
+const int v = 4;
+bool return = false;
+
+function bool test(int jid) = if (jid==4) then true else false;
+
+process isalign()
+{
+invariant(test(4)== true) {= return=true =}
+} 
+ 
+isalign()
+
+
