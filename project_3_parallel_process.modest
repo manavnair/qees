@@ -1,3 +1,5 @@
+//test
+
 action start_p,available_p,idle_p,preheat;
 action start_a,idle_a,align,is_slew_needed,slewed,correct_attitude,available_a,start,end,check_attitude,is_slew_back_needed,slew_back,correct_slew_back;
 action start_b,update_b,depletion,not_depleted;
