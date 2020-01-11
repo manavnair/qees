@@ -1,0 +1,73 @@
+action start_p,available_p,idle_p,preheat;
+action start_a,idle_a,align,is_slew_needed,slewed,correct_attitude,available_a,start,end,check_attitude,is_slew_back_needed,slew_back,correct_slew_back;
+action start_b,update_b,depletion,not_depleted;
+
+action start_p_Lband,available_p_Lband,idle_p_Lband,preheat_Lband;
+action start_p_Xband,available_p_Xband,idle_p_Xband,preheat_Xband;
+action start_p_UHF,available_p_UHF,idle_p_UHF,preheat_UHF;
+
+
+bool isaligned = false;
+bool reached = true; 
+
+process JobProvider(int (1..3) jid)
+{
+start_p;
+do {
+available_p;
+idle_p;
+preheat
+}
+}
+
+process battery()
+{
+start_b;
+
+do {
+update_b;
+alt {
+::depletion
+::not_depleted
+}
+}}
+
+process JobAutomaton()
+{
+start_a;
+
+do {
+idle_a;
+align;
+alt {
+::when (isaligned == false) is_slew_needed; 
+when(reached == true)slewed 
+:: when (isaligned == true) correct_attitude
+};
+available_a;
+start;
+end;
+check_attitude;
+alt {
+::is_slew_back_needed; slew_back
+::correct_slew_back
+}}}
+
+
+par{
+
+::JobAutomaton()
+::battery()
+
+::	relabel { start_p,  available_p,  idle_p,   preheat   }
+	by      { start_p_Lband, available_p_Lband, idle_p_Lband, preheat_Lband }
+	JobProvider(1)
+	
+::	relabel { start_p,  available_p,  idle_p,   preheat   }
+	by      { start_p_Xband, available_p_Xband, idle_p_Xband, preheat_Xband }
+	JobProvider(2)	
+	
+::	relabel { start_p,  available_p,  idle_p,   preheat   }
+	by      { start_p_UHF, available_p_UHF, idle_p_UHF, preheat_UHF }
+	JobProvider(3)		
+}
