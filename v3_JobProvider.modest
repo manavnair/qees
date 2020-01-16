@@ -1,0 +1,50 @@
+action start_p,available,not_available,preheat,skip;
+
+
+clock gc;
+int [] actual_Start_Time_X = [14,20];
+int [] Start_With_preheat_X = [14,18];
+int [] EndTime_X = [20,24];
+
+int [] actual_Start_Time_L = [16,24];
+int [] Start_With_preheat_L = [14,19];
+int [] EndTime_L = [18,28];
+
+
+
+process JobProvider_X()
+{
+int (0..1) i;
+int (0..2) skip;
+start_p;
+do {
+invariant(gc <  Start_With_preheat_X[i] || gc > Start_With_preheat_X[i] ) alt {
+:: when(gc == Start_With_preheat_X[i]) preheat
+:: when( gc > Start_With_preheat_X[i]) skip{= i=i+1, skip=skip+1 =}
+};
+invariant (gc < actual_Start_Time_X[i]) when (gc == actual_Start_Time_X[i]) available;
+invariant (gc < EndTime_X[i]) when (gc == EndTime_X[i]) not_available{= i=i+1 =}
+}
+}
+
+
+
+process JobProvider_L()
+{
+int (0..1) i;
+int (0..2) skip;
+start_p;
+do {
+invariant(gc <  Start_With_preheat_L[i] || gc > Start_With_preheat_L[i] ) alt {
+:: when(gc == Start_With_preheat_L[i]) preheat
+:: when( gc > Start_With_preheat_L[i]) skip{= i=i+1 =}
+};
+invariant (gc < actual_Start_Time_L[i]) when (gc == actual_Start_Time_L[i]) available;
+invariant (gc < EndTime_L[i]) when (gc == EndTime_L[i]) not_available{= i=i+1 =}
+}
+}
+
+par {
+::JobProvider_L()
+::JobProvider_X()
+}
